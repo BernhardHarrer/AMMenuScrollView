@@ -71,7 +71,11 @@
     
 }
 
-
+- (void)scrollToItem:(NSInteger)index
+{
+    NSLog(@"Scroll to item");
+    [self setContentOffset:CGPointMake(index * (self.frame.size.width / 2), 0) animated:YES];
+}
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
@@ -101,6 +105,8 @@
     [self.items setObject:cell atIndexedSubscript:index];
     
 }
+
+
 
 #pragma mark - AMMenueScrollViewCellDelegate
 
@@ -139,7 +145,7 @@
         if (newPage > self.contentSize.width / pageWidth)
             newPage = ceil(self.contentSize.width / pageWidth) - 1.0;
     }
-
+    [self.menueDelegate menuScrollView:self didSelectItemAtIndex:newPage];
     *targetContentOffset = CGPointMake(newPage * pageWidth, targetContentOffset->y);
 }
 
