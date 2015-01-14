@@ -18,6 +18,7 @@
 @property (nonatomic,weak) IBOutlet id<AMMenuScrollViewDelegate> menueDelegate;
 
 - (void)scrollToItem:(NSInteger)index;
+- (void)loadView;
 
 @end
 

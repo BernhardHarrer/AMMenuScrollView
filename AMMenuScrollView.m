@@ -19,7 +19,7 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-  
+    
     self = [super initWithFrame:frame];
     if (self) {
         _items = [[NSMutableArray alloc] init];
@@ -27,7 +27,7 @@
         self.pagingEnabled = NO;
     }
     return self;
-
+    
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder
@@ -51,6 +51,15 @@
 - (void)awakeFromNib
 {
     [self reloadItems];
+    
+}
+
+/*
+ Needs to be called after viewDidLayoutSubviews when using Autolayout
+ */
+- (void)loadView
+{
+    
     [self renderItems];
 }
 
@@ -61,6 +70,7 @@
     CGPoint centerStartPosition = CGPointMake((self.frame.size.width / 2), self.frame.size.height / 2);
     
     [self.items enumerateObjectsUsingBlock:^(AMMenuScrollViewCell *cell, NSUInteger idx, BOOL *stop) {
+        [cell removeFromSuperview];
         CGPoint newCenter = CGPointMake(centerStartPosition.x * (idx + 1), centerStartPosition.y);
         [cell setIndex:idx];
         [cell setDelegate:self];
@@ -73,7 +83,6 @@
 
 - (void)scrollToItem:(NSInteger)index
 {
-    NSLog(@"Scroll to item");
     [self setContentOffset:CGPointMake(index * (self.frame.size.width / 2), 0) animated:YES];
 }
 
@@ -99,9 +108,9 @@
 
 - (void)reloadItem:(NSInteger)index
 {
-
+    
     AMMenuScrollViewCell *cell = [_dataSource menuScrollView:self cellForItem:index];
-
+    
     [self.items setObject:cell atIndexedSubscript:index];
     
 }
