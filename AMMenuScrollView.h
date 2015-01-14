@@ -17,6 +17,8 @@
 @property (nonatomic,weak) IBOutlet id<AMMenuScrollViewDataSource> dataSource;
 @property (nonatomic,weak) IBOutlet id<AMMenuScrollViewDelegate> menueDelegate;
 
+- (void)scrollToItem:(NSInteger)index;
+
 @end
 
 @protocol AMMenuScrollViewDelegate
