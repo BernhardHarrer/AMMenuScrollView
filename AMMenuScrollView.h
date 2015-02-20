@@ -19,6 +19,8 @@
 
 - (void)scrollToItem:(NSInteger)index;
 - (void)loadView;
+- (void)reloadItems;
+- (void)clean;
 
 @end
 

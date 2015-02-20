@@ -19,7 +19,7 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-    
+  
     self = [super initWithFrame:frame];
     if (self) {
         _items = [[NSMutableArray alloc] init];
@@ -27,7 +27,7 @@
         self.pagingEnabled = NO;
     }
     return self;
-    
+
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder
@@ -50,25 +50,41 @@
 
 - (void)awakeFromNib
 {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gotoPage:) name:@"AMMenueScrollViewGotoPage" object:nil];
     [self reloadItems];
-    
+
 }
 
+- (void)gotoPage:(NSNotification *) notification
+{
+    NSDictionary *userInfo = [notification userInfo];
+    [self scrollToItem:[[userInfo objectForKey:@"page"] integerValue]];
+    [self.menueDelegate menuScrollView:self didSelectItemAtIndex:[[userInfo objectForKey:@"page"] integerValue]];
+}
 /*
  Needs to be called after viewDidLayoutSubviews when using Autolayout
  */
 - (void)loadView
 {
-    
+
     [self renderItems];
+}
+
+- (void)clean
+{
+    [self.items enumerateObjectsUsingBlock:^(AMMenuScrollViewCell *cell, NSUInteger idx, BOOL *stop) {
+        [cell removeFromSuperview];
+        
+        
+    }];
 }
 
 
 - (void)renderItems
 {
-    
+
     CGPoint centerStartPosition = CGPointMake((self.frame.size.width / 2), self.frame.size.height / 2);
-    
+
     [self.items enumerateObjectsUsingBlock:^(AMMenuScrollViewCell *cell, NSUInteger idx, BOOL *stop) {
         [cell removeFromSuperview];
         CGPoint newCenter = CGPointMake(centerStartPosition.x * (idx + 1), centerStartPosition.y);
@@ -84,6 +100,7 @@
 - (void)scrollToItem:(NSInteger)index
 {
     [self setContentOffset:CGPointMake(index * (self.frame.size.width / 2), 0) animated:YES];
+    self.currentPage = index;
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -108,9 +125,9 @@
 
 - (void)reloadItem:(NSInteger)index
 {
-    
+
     AMMenuScrollViewCell *cell = [_dataSource menuScrollView:self cellForItem:index];
-    
+
     [self.items setObject:cell atIndexedSubscript:index];
     
 }
@@ -121,8 +138,12 @@
 
 - (void)didSelectCellAtIndex:(NSInteger)index
 {
-    [self setContentOffset:CGPointMake(index * (self.frame.size.width / 2), self.contentOffset.y) animated:YES];
-    [self.menueDelegate menuScrollView:self didSelectItemAtIndex:index];
+    if (index != self.currentPage) {
+        [self setContentOffset:CGPointMake(index * (self.frame.size.width / 2), self.contentOffset.y) animated:YES];
+        self.currentPage = index;
+        [self.menueDelegate menuScrollView:self didSelectItemAtIndex:index];
+    }
+    
 }
 
 #pragma mark - UIScrollViewDelegate
@@ -156,6 +177,11 @@
     }
     [self.menueDelegate menuScrollView:self didSelectItemAtIndex:newPage];
     *targetContentOffset = CGPointMake(newPage * pageWidth, targetContentOffset->y);
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
